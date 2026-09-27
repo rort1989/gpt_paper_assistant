@@ -34,12 +34,18 @@ jobs:
       uses: andstor/file-existence-action@v3
       with:
         files: output.md
-    - name: Convert output.md to pages
+    - name: Prepare homepage
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: cp output.md README.md
+    - name: Convert markdown to pages
       uses: wranders/markdown-to-pages-action@v1.2.0
       if: steps.check_files.outputs.files_exists == 'true'
       with:
-       token: ${{ secrets.GITHUB_TOKEN }}
-       files: output.md
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: README.md
+    - name: Show generated site
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: find dist -maxdepth 3 -type f -print
     - uses: actions/upload-pages-artifact@v3
       if: steps.check_files.outputs.files_exists == 'true'
       with:
